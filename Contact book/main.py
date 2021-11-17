@@ -83,7 +83,10 @@ def modifying_contact(contact, conn):
                             break
                         elif edit == 'e':
                             email = email_address()
+                            sql1 = "update contacts set email = ? where index_value = ?"
+                            conn.execute(sql1, (email, contact,))
                             contact_list[index][2] = email   
+                            conn.commit()
                             break  
                     except ValueError as e:
                         print("please type 'e' or 'n'")
