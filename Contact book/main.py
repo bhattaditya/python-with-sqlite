@@ -40,27 +40,53 @@ def index_generator():
             print("enter again") 
     return index
 
-def adding_contact():
 
-    index = index_generator()
+def adding_contact():
+    index_value = index_generator()
     name = input("Enter Name: ")
     phone = phone_number()   
     email = email_address()
     city_name = input("City: ")
-    contact_list[index] = [name, phone, email, city_name]
+    contact_list[index_value] = [name, phone, email, city_name]
+
+    try:
+        conn = sqlite3.connect("./Contact book/contacts.sqlite")
+        cursor = conn.cursor()
+
+        sql = "Insert into contacts values (?,?,?,?,?)"
+        cursor.execute(sql,(index_value, name, phone, email, city_name))
+        conn.commit()
+        cursor = conn.close()
+
+    except sqlite3.Error as e:
+        print("Cannot add record into table contacts... ", e)    
+
+    finally:
+        if conn:
+            conn.close()
     
-    return contact_list[index], index
+    
 
-
-
-def deleting_contact(contact, conn):
+def deleting_contact(contact):
     if contact not in contact_list:
         return 0
     else:
         del contact_list[contact]   
-        sql1 = "delete from contacts where index_value = ?"
-        conn.execute(sql1, (contact,))
-        conn.commit()
+        try:
+            conn = sqlite3.connect("./Contact book/contacts.sqlite")
+            cursor = conn.cursor()
+
+            sql = "delete from contacts where index_value = ?"
+            cursor.execute(sql, (contact,))
+            conn.commit()
+            cursor = conn.close()
+
+        except sqlite3.Error as e:
+            print("Cannot delete record from table contacts... ", e)    
+
+        finally:
+            if conn:
+                conn.close()
 
 
 
@@ -103,18 +129,7 @@ while True:
         conn = sqlite3.connect("./Contact book/contacts.sqlite")
 
         if choice == 1:
-
-            record, index_value = adding_contact()
-
-            name = record[0]
-            phone = record[1]
-            email = record[2]
-            city_name = record[3]
-            
-
-            sql2 = "Insert into contacts values (?,?,?,?,?)"
-            conn.execute(sql2,(index_value, name, phone, email, city_name))
-            conn.commit()
+            adding_contact()
 
             time.sleep(1)
             print("Contact added successfully!\n")
@@ -122,7 +137,7 @@ while True:
         if  choice == 2:
             
             delete_con = int(input("Enter index: "))
-            status = deleting_contact(delete_con, conn)
+            status = deleting_contact(delete_con)
             time.sleep(1)
 
             if status == 0:
