@@ -96,22 +96,13 @@ def show_contacts(conn):
     sql1 = "Select * from contacts "
     for index_v, name, phone, email, city_name in conn.execute(sql1):
         print(f"index: {index_v} Name: {name} Phone: {phone} Email: {email} City: {city_name}")
-    # for index, details in contact_list.items():
-    #     name, phone, email, city_name = details
-    #     print(f"Index: {index} Name: {name} Email: {email} Phone: {phone} City: {city_name}")
-    # print()
-            
 
 while True:
     try:
         choice = int(input("1. Adding contact\n2. Deleting contact\n3. Modiying contact\n4. Show contact list\n5. Exit\n"))
-        conn = sqlite3.connect("contacts.sqlite")
+        conn = sqlite3.connect("./Contact book/contacts.sqlite")
 
         if choice == 1:
-            # conn = sqlite3.connect("contacts.sqlite")
-            # contact_list[index] = [name, phone, email, city_name]
-            sql1 = "CREATE TABLE IF NOT EXISTS contacts (index_value integer, name text, phone integer, email text, city_name text)"
-            conn.execute(sql1)
 
             record, index_value = adding_contact()
 
@@ -131,7 +122,6 @@ while True:
         if  choice == 2:
             
             delete_con = int(input("Enter index: "))
-            # conn = sqlite3.connect("contacts.sqlite")
             status = deleting_contact(delete_con, conn)
             time.sleep(1)
 
@@ -155,7 +145,6 @@ while True:
             if len(contact_list) < 1:
                 print("\ncontact list empty\n") 
             else:
-                # conn = sqlite3.connect("contacts.sqlite")
                 print("Listing contacts:-")
                 time.sleep(1)
                 show_contacts(conn)
