@@ -26,6 +26,7 @@ def email_address():
             break
     return email    
 
+
 def index_generator():
     while True:
         try:
@@ -56,15 +57,15 @@ def adding_contact():
         sql = "Insert into contacts values (?,?,?,?,?)"
         cursor.execute(sql,(index_value, name, phone, email, city_name))
         conn.commit()
-        cursor = conn.close()
 
     except sqlite3.Error as e:
         print("Cannot add record into table contacts... ", e)    
 
     finally:
+        if cursor:
+            cursor.close()
         if conn:
             conn.close()
-    
     
 
 def deleting_contact(contact):
@@ -79,15 +80,15 @@ def deleting_contact(contact):
             sql = "delete from contacts where index_value = ?"
             cursor.execute(sql, (contact,))
             conn.commit()
-            cursor = conn.close()
 
         except sqlite3.Error as e:
             print("Cannot delete record from table contacts... ", e)    
 
         finally:
+            if cursor:
+                cursor.close()
             if conn:
                 conn.close()
-
 
 
 def modifying_contact(contact, conn):
@@ -117,48 +118,78 @@ def modifying_contact(contact, conn):
                     except ValueError as e:
                         print("please type 'e' or 'n'")
 
+def show_contacts_length():
+    try:
+        conn = sqlite3.connect("./Contact book/contacts.sqlite")
+        cursor = conn.cursor()
+        sql = "Select * from contacts"
+        result  = cursor.execute(sql)
+        return len(result.fetchall()) 
 
-def show_contacts(conn):
-    sql1 = "Select * from contacts"
-    result  = conn.execute(sql1)
-    if len(result.fetchall()) < 1:
-        time.sleep(1)
-        print("Contact list is empty...")
-    else:  
-        time.sleep(1)  
-        for index_v, name, phone, email, city_name in conn.execute(sql1):
-            print(f"index: {index_v} Name: {name} Phone: {phone} Email: {email} City: {city_name}")
+    except sqlite3.Error as e:
+        print(e)    
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def show_contacts():
+    try:
+        conn = sqlite3.connect("./Contact book/contacts.sqlite")
+        cursor = conn.cursor()
+
+        if show_contacts_length() < 1:
+            time.sleep(1)
+            print("Contact book is empty...")
+        else:  
+            print("Fetching details...")
+            time.sleep(1)  
+            sql = "Select * from contacts"
+            for index_v, name, phone, email, city_name in cursor.execute(sql):
+                print(f"index: {index_v} Name: {name} Phone: {phone} Email: {email} City: {city_name}")           
+        
+    except sqlite3.Error as e:
+        print(e)    
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 
 while True:
     try:
-        choice = int(input("1. Adding contact\n2. Deleting contact\n3. Modiying contact\n4. Show contact list\n5. Exit\n\n>: "))
+        choice = int(input("1. Adding contact\n2. Deleting contact\n3. Modiying contact\n4. Show contacts list\n5. Exit\n\n>: "))
         conn = sqlite3.connect("./Contact book/contacts.sqlite")
 
         if choice == 1:
             adding_contact()
-
             time.sleep(1)
             print("Contact added successfully!\n")
 
             print()
             
         if  choice == 2:
-            
-            delete_con = int(input("Enter index: "))
-            status = deleting_contact(delete_con)
-            time.sleep(1)
-
-            if status == 0:
-                print("Index not found...\n")
+            if show_contacts_length() < 1:
+                time.sleep(1)
+                print("Contacts length is empty...")
             else:
-                print(f"{delete_con} index removed!\n")
+                delete_con = int(input("Enter index: "))
+                status = deleting_contact(delete_con)
+                time.sleep(1)
+                if status == 0:
+                    print("Index not found...\n")
+                else:
+                    print(f"{delete_con} index removed!\n")
 
             print()
 
         if choice == 3:
             modify_ind = int(input("Enter index: "))
             status = modifying_contact(modify_ind, conn)
-
             time.sleep(1)
             if status == 0:
                 print("Index not found...\n")
@@ -168,8 +199,8 @@ while True:
             print()
 
         if choice == 4:
+            show_contacts()
 
-            show_contacts(conn)
             print()
 
 
@@ -178,7 +209,8 @@ while True:
             time.sleep(1)
             break
         
-        time.sleep(1)
+        time.sleep(1) 
+
     except ValueError as e:
         print(e)
     
