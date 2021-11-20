@@ -119,13 +119,19 @@ def modifying_contact(contact, conn):
 
 
 def show_contacts(conn):
-    sql1 = "Select * from contacts "
-    for index_v, name, phone, email, city_name in conn.execute(sql1):
-        print(f"index: {index_v} Name: {name} Phone: {phone} Email: {email} City: {city_name}")
+    sql1 = "Select * from contacts"
+    result  = conn.execute(sql1)
+    if len(result.fetchall()) < 1:
+        time.sleep(1)
+        print("Contact list is empty...")
+    else:  
+        time.sleep(1)  
+        for index_v, name, phone, email, city_name in conn.execute(sql1):
+            print(f"index: {index_v} Name: {name} Phone: {phone} Email: {email} City: {city_name}")
 
 while True:
     try:
-        choice = int(input("1. Adding contact\n2. Deleting contact\n3. Modiying contact\n4. Show contact list\n5. Exit\n"))
+        choice = int(input("1. Adding contact\n2. Deleting contact\n3. Modiying contact\n4. Show contact list\n5. Exit\n\n>: "))
         conn = sqlite3.connect("./Contact book/contacts.sqlite")
 
         if choice == 1:
@@ -133,6 +139,8 @@ while True:
 
             time.sleep(1)
             print("Contact added successfully!\n")
+
+            print()
             
         if  choice == 2:
             
@@ -145,26 +153,28 @@ while True:
             else:
                 print(f"{delete_con} index removed!\n")
 
+            print()
+
         if choice == 3:
             modify_ind = int(input("Enter index: "))
             status = modifying_contact(modify_ind, conn)
 
             time.sleep(1)
             if status == 0:
-                print("Name not found...\n")
+                print("Index not found...\n")
             else:
                 print(f"{modify_ind} index modified!\n")
 
+            print()
+
         if choice == 4:
 
-            if len(contact_list) < 1:
-                print("\ncontact list empty\n") 
-            else:
-                print("Listing contacts:-")
-                time.sleep(1)
-                show_contacts(conn)
+            show_contacts(conn)
+            print()
+
 
         if choice == 5:
+            print()
             time.sleep(1)
             break
         
