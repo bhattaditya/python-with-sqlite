@@ -28,23 +28,51 @@ def email_address():
 
 
 def index_generator():
-    while True:
+    generated = False
+
+    while not generated:
         try:
-            index = int(input("Please enter this number carefully asa it can not be changed later: "))
-            if index in contact_list:
+            index_value = int(input("Please enter this number carefully as it can not be changed later: "))
+            if index_value in contact_list:
                 print("Index already exists")
-                continue
             else:
-                break
+                try:
+                    print("checking in DB")
+                    found = 0
+                    time.sleep(2)
+                    conn = sqlite3.connect("./Contact book/contacts.sqlite")
+                    cursor = conn.cursor()
+                    sql = "Select index_value from contacts"
+                    result = cursor.execute(sql)
+                    for res in result:
+                        if (index_value,) == res:
+                            found = 1
+                            print("Index already exists...")
+                            time.sleep(1)
+
+                    if found == 0:
+                        print("Please enter below details")
+                        generated = True
+
+                except sqlite3.Error as e:
+                    print(e)    
+
+                finally:
+                    if cursor:
+                        cursor.close()
+                    if conn:
+                        conn.close()
+
         except ValueError as e:
             print(e)   
             print("enter again") 
-    return index
+
+    return index_value
 
 
 def adding_contact():
     index_value = index_generator()
-    name = input("Enter Name: ")
+    name = input("Name: ")
     phone = phone_number()   
     email = email_address()
     city_name = input("City: ")
@@ -57,6 +85,8 @@ def adding_contact():
         sql = "Insert into contacts values (?,?,?,?,?)"
         cursor.execute(sql,(index_value, name, phone, email, city_name))
         conn.commit()
+        time.sleep(1)
+        print("Contact added successfully!\n")       
 
     except sqlite3.Error as e:
         print("Cannot add record into table contacts... ", e)    
@@ -167,8 +197,6 @@ def menu():
 
             if choice == 1:
                 adding_contact()
-                time.sleep(1)
-                print("Contact added successfully!\n")
 
                 print()
                 
@@ -212,7 +240,7 @@ def menu():
             time.sleep(1) 
 
         except ValueError as e:
-            print(e)  
+            print(e)
 
 if __name__ == "__main__":
-    menu() 
+    menu()        
