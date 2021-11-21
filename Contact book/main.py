@@ -99,26 +99,33 @@ def adding_contact():
     
 
 def deleting_contact(contact):
-    if contact not in contact_list:
-        return 0
-    else:
-        del contact_list[contact]   
-        try:
-            conn = sqlite3.connect("./Contact book/contacts.sqlite")
-            cursor = conn.cursor()
+    try:
+        conn = sqlite3.connect("./Contact book/contacts.sqlite")
+        cursor = conn.cursor()
 
-            sql = "delete from contacts where index_value = ?"
-            cursor.execute(sql, (contact,))
+        sql = "Select index_value from contacts"
+        result = cursor.execute(sql)
+        found = 0
+        for res in result:
+            if (contact,) == res:
+                found = 1
+        if found == 0:
+            return 0
+        elif found == 1: 
+            sql1 = "delete from contacts where index_value = ?"
+            cursor.execute(sql1, (contact,))
             conn.commit()
+        else:
+            print("What happened!")
 
-        except sqlite3.Error as e:
-            print("Cannot delete record from table contacts... ", e)    
+    except sqlite3.Error as e:
+        print("Cannot delete record from table contacts... ", e)    
 
-        finally:
-            if cursor:
-                cursor.close()
-            if conn:
-                conn.close()
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 
 def modifying_contact(contact, conn):
