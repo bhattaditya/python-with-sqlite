@@ -159,59 +159,60 @@ def show_contacts():
         if conn:
             conn.close()
 
+def menu():
+    while True:
+        try:
+            choice = int(input("1. Adding contact\n2. Deleting contact\n3. Modiying contact\n4. Show contacts list\n5. Exit\n\n>: "))
+            conn = sqlite3.connect("./Contact book/contacts.sqlite")
 
-while True:
-    try:
-        choice = int(input("1. Adding contact\n2. Deleting contact\n3. Modiying contact\n4. Show contacts list\n5. Exit\n\n>: "))
-        conn = sqlite3.connect("./Contact book/contacts.sqlite")
-
-        if choice == 1:
-            adding_contact()
-            time.sleep(1)
-            print("Contact added successfully!\n")
-
-            print()
-            
-        if  choice == 2:
-            if show_contacts_length() < 1:
+            if choice == 1:
+                adding_contact()
                 time.sleep(1)
-                print("Contacts length is empty...")
-            else:
-                delete_con = int(input("Enter index: "))
-                status = deleting_contact(delete_con)
+                print("Contact added successfully!\n")
+
+                print()
+                
+            if  choice == 2:
+                if show_contacts_length() < 1:
+                    time.sleep(1)
+                    print("Contacts length is empty...")
+                else:
+                    delete_con = int(input("Enter index: "))
+                    status = deleting_contact(delete_con)
+                    time.sleep(1)
+                    if status == 0:
+                        print("Index not found...\n")
+                    else:
+                        print(f"{delete_con} index removed!\n")
+
+                print()
+
+            if choice == 3:
+                modify_ind = int(input("Enter index: "))
+                status = modifying_contact(modify_ind, conn)
                 time.sleep(1)
                 if status == 0:
                     print("Index not found...\n")
                 else:
-                    print(f"{delete_con} index removed!\n")
+                    print(f"{modify_ind} index modified!\n")
 
-            print()
+                print()
 
-        if choice == 3:
-            modify_ind = int(input("Enter index: "))
-            status = modifying_contact(modify_ind, conn)
-            time.sleep(1)
-            if status == 0:
-                print("Index not found...\n")
-            else:
-                print(f"{modify_ind} index modified!\n")
+            if choice == 4:
+                show_contacts()
 
-            print()
-
-        if choice == 4:
-            show_contacts()
-
-            print()
+                print()
 
 
-        if choice == 5:
-            print()
-            time.sleep(1)
-            break
-        
-        time.sleep(1) 
+            if choice == 5:
+                print()
+                time.sleep(1)
+                break
+            
+            time.sleep(1) 
 
-    except ValueError as e:
-        print(e)
-    
+        except ValueError as e:
+            print(e)  
 
+if __name__ == "__main__":
+    menu() 
